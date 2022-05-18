@@ -66,7 +66,7 @@ const Todolist = () => {
             return;
         }
         const newItems = todoItems.filter((curr)=>{
-            if (id != curr.id)
+            if (id !== curr.id)
             return curr;
         })
         setTodoItems(newItems);
