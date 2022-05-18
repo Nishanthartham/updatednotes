@@ -2,6 +2,16 @@ import React, { useState, useEffect } from "react";
 import "./todo.css";
 
 // get the localStorage data back
+const getLocalData = () =>{
+    const temp = JSON.parse(localStorage.getItem("TodoListItems"));
+    if (temp){
+        return temp;
+    }
+    else{
+        return []
+    }
+     
+}
 
 
 const Todolist = () => {
@@ -17,26 +27,39 @@ const Todolist = () => {
 
     // adding localStorage
     const [inputData, setInputData] = useState("")
-    const [todoItems, setTodoItems] = useState([]);
+    const [todoItems, setTodoItems] = useState(getLocalData());
+    const [editingItem,setEditingItem] = useState();
     const [togggleButt,setTogggleButt] = useState(false);
-    let replaceData;
-    console.log(inputData);
+    // console.log(inputData);
     const addItem = () => {
         if (!inputData){
             alert("Enter data in input box");
             return;}
-        
+        else if (inputData && togggleButt){
+            setTodoItems( todoItems.map((Curr)=>{
+                if (Curr.id === editingItem.id )
+                return {...Curr,data:inputData}
+                return Curr;
+            })
+            )
+            
+            setInputData("");
+            setTogggleButt(false);
+            setEditingItem(null);
+        }
+    
+        else{
         const newInputData = {
             id : new Date().getTime(),
             data : inputData
         }
-
-            setTodoItems([newInputData,...todoItems])
-            setInputData("");
-            setTogggleButt(false);
+        setInputData("");
+        setTodoItems([newInputData,...todoItems])
 
         console.log(todoItems);
     }
+};
+
     const deleteItem = (id) => {
         if (id === "all"){
             setTodoItems([]);
@@ -51,15 +74,20 @@ const Todolist = () => {
     const editItem = (obj) =>{
         setInputData(obj.data);
         setTogggleButt(true);
-        deleteItem(obj.id);
+        setEditingItem(obj);
+        // deleteItem(obj.id);
     }
+    useEffect(() => {
+      localStorage.setItem("TodoListItems",JSON.stringify(todoItems))
+    }, [todoItems])
+    
     return (
         <>
             <div className="main-div">
                 <div className="child-div">
                     <figure>
                         <img src={process.env.PUBLIC_URL + '/images/new.jpeg'} alt="todologo" />
-                        <figcaption>Add Your List Here ✌</figcaption>
+                        <figcaption>Add Your List Here and don't lose it even after refreshing ✌ </figcaption>
                     </figure>
                     <div className="addItems">
                         <input
